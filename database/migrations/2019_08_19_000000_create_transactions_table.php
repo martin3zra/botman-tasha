@@ -20,6 +20,7 @@ class CreateTransactionsTable extends Migration
             $table->string('currency', 3);
             $table->double('amount', 16, 2);
             $table->timestamp('date')->useCurrent();
+            $table->timestamps();
         });
     }
 
