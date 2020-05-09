@@ -2,9 +2,13 @@
 
 namespace App\Http\Conversations;
 
-use Validator;
 use App\User;
+use Validator;
+use App\Currency;
 use BotMan\BotMan\Messages\Incoming\Answer;
+use BotMan\BotMan\Messages\Outgoing\Question;
+use App\Http\Conversations\MenuOptionsConversation;
+use BotMan\BotMan\Messages\Outgoing\Actions\Button;
 use BotMan\BotMan\Messages\Conversations\Conversation;
 
 class SignUpConversation extends Conversation {
@@ -88,27 +92,54 @@ class SignUpConversation extends Conversation {
     }
 
     private function askCurrency() {
-        $this->ask('What is your Currency?', function(Answer $answer) {
-            $validator = Validator::make(['currency' => $answer->getText()], [
-                'currency' => 'required|min:3|max:5'
-            ]);
 
-            if ($validator->fails()) {
-                return $this->repeat('That doesn\'t look like a valid currency. Please try again.');
+        $buttons = [];
+        $currencies = Currency::all();
+
+        foreach ($currencies as $currency) {
+            $buttons[] = Button::create($currency->code . ' - '. $currency->country)->value($currency->code);
+        }
+
+        $question = Question::create("Choose a desire currency for you.")
+            ->addButtons($buttons);
+
+        $this->ask($question, function(Answer $answer) {
+            if ($answer->isInteractiveMessageReply()) {
+                $this->info['currency'] = $answer->getText();
+                $this->bot->reply('Your currency is: ' . $answer->getText());
+                $this->registerUser();
             }
-
-           $this->info['currency'] = $answer->getText();
-
-           $this->bot->typesAndWaits(.5);
-
-           User::createFromIncomingMessage($this->info);
-           $this->say('Great!');
-           $this->startTransactionConversations();
         });
     }
 
     private function startTransactionConversations() {
-        // $this->bot->startConversation(new OnboardingConversation());
-         $this->bot->reply('Starting a new conversation for performing a transaction.');
+        $this->bot->startConversation(new MenuOptionsConversation());
+    }
+
+    private function registerUser() {
+        $user = $this->findUser();
+        if ($user) {
+            $this->bot->reply('Whoops, An account already exists with this phone numer.');
+            $this->bot->reply('Type "register" and try again.');
+            return;
+        }
+
+        User::createFromIncomingMessage($this->info);
+        $user = $this->findUser();
+        if ($user) {
+            $this->bot->driverStorage()->save([
+                'user' => $user,
+            ]);
+
+            $this->say('Great!');
+            $this->startTransactionConversations();
+            return ;
+        }
+
+        $this->bot->reply('Whoops, something wrong happened.');
+    }
+
+    private function findUser() {
+        return User::where('phone', $this->info['phone'])->first();
     }
 }

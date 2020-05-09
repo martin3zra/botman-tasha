@@ -2,12 +2,16 @@
 
 namespace App\Http\Conversations;
 
-use Validator;
 use App\User;
+use Validator;
 use BotMan\BotMan\Messages\Incoming\Answer;
+use BotMan\BotMan\Messages\Outgoing\Question;
+use App\Http\Conversations\MenuOptionsConversation;
+use BotMan\BotMan\Messages\Outgoing\Actions\Button;
 use BotMan\BotMan\Messages\Conversations\Conversation;
 
 class AuthConversation extends Conversation {
+
     protected $user;
 
     public function run()
@@ -17,7 +21,7 @@ class AuthConversation extends Conversation {
     }
 
     private function sayWelcomeAndAuthenticateIfPossible() {
-        $this->bot->reply('Welcome back! 🎉.');
+
         $this->askPhoneNumber();
     }
 
@@ -34,6 +38,8 @@ class AuthConversation extends Conversation {
             $this->user = User::where('phone', $answer->getText())->first();
 
             if ($this->user) {
+
+                $this->bot->reply('Welcome back! '. $this->user->first_name . ' ' . $this->user->last_name);
                 $this->askPin();
                 return;
             }
@@ -89,12 +95,15 @@ class AuthConversation extends Conversation {
                 return ;
             }
 
+            $this->bot->driverStorage()->save([
+                'user' => $this->user,
+            ]);
+
             $this->startTransactionConversations();
         });
     }
 
     private function startTransactionConversations() {
-        // $this->bot->startConversation(new OnboardingConversation());
-         $this->bot->reply('Starting a new conversation for performing a transaction.');
+        $this->bot->startConversation(new MenuOptionsConversation());
     }
 }

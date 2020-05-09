@@ -27,7 +27,7 @@ class Tasha extends Controller
         $botman = BotManFactory::create($this->config, new LaravelCache());
 
         // Hears for whisper to start the onboarding process
-        $botman->hears('GET_STARTED', function(BotMan $bot) {
+        $botman->hears('GET_STARTED|hey|start', function(BotMan $bot) {
             $bot->startConversation(new OnboardingConversation());
         });
 
