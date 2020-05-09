@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use BotMan\BotMan\BotMan;
 use BotMan\BotMan\BotManFactory;
 use BotMan\BotMan\Drivers\DriverManager;
-
+use BotMan\BotMan\Cache\LaravelCache;
+use App\Http\Conversations\OnboardingConversation;
 
 class Tasha extends Controller
 {
@@ -21,11 +22,11 @@ class Tasha extends Controller
         DriverManager::loadDriver(\BotMan\Drivers\Web\WebDriver::class);
 
         // Create an instance
-        $botman = BotManFactory::create($this->config);
+        $botman = BotManFactory::create($this->config, new LaravelCache());
 
-        // Give the bot something to listen for.
-        $botman->hears('hello', function (BotMan $bot) {
-            $bot->reply('Hello yourself.');
+        // Hears for whisper to start the onboarding process
+        $botman->hears('GET_STARTED', function(BotMan $bot) {
+            $bot->startConversation(new OnboardingConversation());
         });
 
         // Start listening
