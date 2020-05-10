@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Currency;
 use BotMan\BotMan\BotMan;
 use Illuminate\Http\Request;
 use BotMan\BotMan\BotManFactory;
@@ -25,7 +26,7 @@ class Tasha extends Controller
 
         // Create an instance
         $botman = BotManFactory::create($this->config, new LaravelCache());
-
+        $this->loadCurrencies($botman);
         // Hears for whisper to start the onboarding process
         $botman->hears('GET_STARTED|hey|start', function(BotMan $bot) {
             $bot->startConversation(new OnboardingConversation());
@@ -51,5 +52,15 @@ class Tasha extends Controller
 
         // Start listening
         $botman->listen();
+    }
+
+
+    private function loadCurrencies(BotMan $bot) {
+        //Cache currencies to avoid loading each time from the database
+        //by storing on the driver storage, in this case web driver.
+        $currencies = Currency::all();
+        $bot->driverStorage()->save([
+                'currencies' => $currencies,
+            ]);
     }
 }

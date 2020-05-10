@@ -4,7 +4,6 @@ namespace App\Http\Conversations;
 
 use App\User;
 use Validator;
-use App\Currency;
 use App\Transaction;
 use App\Services\ExchangeService;
 use BotMan\BotMan\Messages\Incoming\Answer;
@@ -71,12 +70,12 @@ class DepositConversation extends Conversation {
     }
 
     private function askDifferentCurrency() {
-
+        $data = $this->bot->driverStorage()->find();
+        $currencies = $data->get('currencies');
         $buttons = [];
-        $currencies = Currency::all();
 
         foreach ($currencies as $currency) {
-            $buttons[] = Button::create($currency->code . ' - '. $currency->country)->value($currency->code);
+            $buttons[] = Button::create($currency['code'] . ' - '. $currency['country'])->value($currency['code']);
         }
 
         $question = Question::create("Choose a desire currency for you deposit.")

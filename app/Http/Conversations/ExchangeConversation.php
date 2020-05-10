@@ -4,7 +4,6 @@ namespace App\Http\Conversations;
 
 use App\User;
 use Validator;
-use App\Currency;
 use App\Transaction;
 use GuzzleHttp\Client;
 use App\Services\ExchangeService;
@@ -25,7 +24,8 @@ class ExchangeConversation extends Conversation {
     {
         $data = $this->bot->driverStorage()->find();
         $this->loggedUser = $data->get('user');
-        $this->currencies = Currency::all();
+        $dataCurrencies = $this->bot->driverStorage()->find();
+        $this->currencies = $dataCurrencies->get('currencies');
         $this->askFromCurrency();
     }
 
@@ -34,7 +34,7 @@ class ExchangeConversation extends Conversation {
 
         foreach ($this->currencies as $currency) {
 
-            $buttons[] = Button::create($currency->code . ' - '. $currency->country)->value($currency->code);
+            $buttons[] = Button::create($currency['code'] . ' - '. $currency['country'])->value($currency['code']);
         }
 
         $question = Question::create('Choose the currency that your money is at the moment.')
@@ -53,8 +53,8 @@ class ExchangeConversation extends Conversation {
         $buttons = [];
 
         foreach ($this->currencies as $currency) {
-            if ($currency != $this->fromCurrency) {
-                $buttons[] = Button::create($currency->code . ' - '. $currency->country)->value($currency->code);
+            if ($currency['code'] != $this->fromCurrency) {
+                $buttons[] = Button::create($currency['code'] . ' - '. $currency['country'])->value($currency['code']);
             }
         }
 
