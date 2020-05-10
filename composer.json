@@ -12,6 +12,7 @@
         "botman/botman": "^2.5",
         "botman/driver-web": "^1.5",
         "fideloper/proxy": "^4.0",
+        "guzzlehttp/guzzle": "^6.5",
         "laravel/framework": "^6.2",
         "laravel/tinker": "^2.0"
     },
@@ -60,10 +61,10 @@
             "@php artisan key:generate --ansi"
         ]
     },
-"repositories": [
-{
-"type": "vcs",
-"url": "https://github.com/botman/botman"
-}
-]
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/botman/botman"
+        }
+    ]
 }
