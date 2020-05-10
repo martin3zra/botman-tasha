@@ -16,11 +16,14 @@ class Transaction extends Model
         $records = Transaction::where('user_id', $userID)->get();
         $total = $records->sum(function($trans) {
 
-            if ($trans->type === 'withdraw') {
-                return ($trans->amount * -1);
+            switch ($trans->type) {
+                case 'exchange':
+                    return 0;
+                case 'withdraw':
+                    return ($trans->amount * -1);
+                default:
+                    return $trans->amount;
             }
-
-            return $trans->amount;
         });
 
         return $total;
