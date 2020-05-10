@@ -6,6 +6,7 @@ use App\User;
 use Validator;
 use App\Currency;
 use App\Transaction;
+use App\Services\ExchangeService;
 use BotMan\BotMan\Messages\Incoming\Answer;
 use BotMan\BotMan\Messages\Outgoing\Question;
 use App\Http\Conversations\MenuOptionsConversation;
@@ -16,6 +17,11 @@ class DepositConversation extends Conversation {
     protected $loggedUser;
     protected $amount;
     protected $currency;
+    protected $needExchange;
+
+    public function __construct() {
+        $this->needExchange = false;
+    }
 
     public function run()
     {
@@ -47,6 +53,7 @@ class DepositConversation extends Conversation {
     }
 
     private function askCurrency() {
+        $this->needExchange = false;
         $question = Question::create('Your default currency is '.$this->currency.'. Do you want use a different one?')
                 ->addButtons([
                     Button::create('Nope')->value('no'),
@@ -55,6 +62,7 @@ class DepositConversation extends Conversation {
 
         $this->ask($question, function(Answer $answer) {
             if ($answer->getValue() === 'yes') {
+                $this->needExchange = true;
                 $this->askDifferentCurrency();
             } else {
                 $this->askConfirmation();
@@ -105,10 +113,19 @@ class DepositConversation extends Conversation {
 
     private function persistDeposit() {
 
+        //If the user provide a currency different of the default
+        //then we need to perform money exchange
+        if($this->needExchange) {
+            $this->amount = $this->computedAmount();
+            if ($this->amount == 0) {
+                return ;
+            }
+        }
+
         Transaction::createDepositFromIncomingMessage([
             'user_id' => $this->loggedUser['id'],
             'amount' => $this->amount,
-            'currency' => $this->currency,
+            'currency' => $this->loggedUser['currency'],
         ]);
 
         $this->bot->typesAndWaits(.5);
@@ -134,5 +151,15 @@ class DepositConversation extends Conversation {
                 $this->bot->startConversation(new MenuOptionsConversation());
             }
         });
+    }
+
+    private function computedAmount() {
+        try {
+            $service = new ExchangeService();
+            return $service->convert($this->currency, $this->loggedUser['currency'], $this->amount);
+        } catch(Exception $e) {
+            $this->bot->reply($e->getMessage());
+            return 0;
+        }
     }
 }
