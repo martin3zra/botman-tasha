@@ -7,6 +7,7 @@ use Validator;
 use App\Currency;
 use App\Transaction;
 use GuzzleHttp\Client;
+use App\Services\ExchangeService;
 use BotMan\BotMan\Messages\Incoming\Answer;
 use BotMan\BotMan\Messages\Outgoing\Question;
 use App\Http\Conversations\MenuOptionsConversation;
@@ -128,42 +129,23 @@ class ExchangeConversation extends Conversation {
 
     private function convertMoney() {
 
-        $url = env('EXCHANGE_URL');
-        $key = env('EXCHANGE_KEY');
-        //GuzzleHttp\Client
-        $client = new Client();
+        try  {
+            $service = new ExchangeService();
+            $newAmount = $service->convert($this->fromCurrency, $this->toCurrency, $this->amount);
 
-        $response = $client->get("{$url}/latest?access_key=$key&symbols={$this->fromCurrency},{$this->toCurrency}&format=1");
-        if ($response->getReasonPhrase() != 'OK') {
-            $this->bot->reply('Whoops. something went wrong...');
+            Transaction::createExchangeFromIncomingMessage([
+                'user_id' => $this->loggedUser['id'],
+                'amount' => $newAmount,
+                'currency' => $this->toCurrency,
+            ]);
+
+            $this->bot->typesAndWaits(.5);
+            $this->bot->reply('Congrats! 🎉. The money convertion was successfully, your returned amount is: ' . $newAmount . $this->toCurrency);
+        }catch (Exception $e) {
+            $this->bot->reply($e->getMessage);
             return;
         }
 
-        $data = json_decode($response->getBody(), true); // returns an array
-
-        if (! boolval($data['success'])) {
-            $this->bot->reply('Whoops. something went wrong... <br />Our third party API for rates converter has some issues at the moment. Can you try it later.');
-            return;
-        }
-
-        //The API provided by Jobsity, whe I am using the free version doesn't allow me to convert money
-        //between rates, so we use the latest API and fetch the rates using `EUR` as base currency
-        //the we convert the given amount to `EUR` and the convert to desired currency
-
-        //base value always will be EUR.
-        $fromCurrency = $data['rates'][$this->fromCurrency];
-        $toCurrency = $data['rates'][$this->toCurrency];
-
-        $newAmount = ($this->amount / $fromCurrency) * $toCurrency;
-
-        Transaction::createExchangeFromIncomingMessage([
-            'user_id' => $this->loggedUser['id'],
-            'amount' => $newAmount,
-            'currency' => $this->toCurrency,
-        ]);
-
-        $this->bot->typesAndWaits(.5);
-        $this->bot->reply('Congrats! 🎉. The money convertion was successfully, your returned amount is: ' . $newAmount . $this->toCurrency);
     }
 
 }
