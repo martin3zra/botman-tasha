@@ -133,19 +133,28 @@ class ExchangeConversation extends Conversation {
         //GuzzleHttp\Client
         $client = new Client();
 
-        $response = $client->get("{$url}?api_key=$key&from={$this->fromCurrency}&to={$this->toCurrency}&amount={$this->amount}");
+        $response = $client->get("{$url}/latest?access_key=$key&symbols={$this->fromCurrency},{$this->toCurrency}&format=1");
         if ($response->getReasonPhrase() != 'OK') {
             $this->bot->reply('Whoops. something went wrong...');
             return;
         }
 
         $data = json_decode($response->getBody(), true); // returns an array
-        if ((int) $data['error'] > 0) {
+
+        if (! boolval($data['success'])) {
             $this->bot->reply('Whoops. something went wrong... <br />Our third party API for rates converter has some issues at the moment. Can you try it later.');
             return;
         }
 
-        $newAmount = $data['amount'];
+        //The API provided by Jobsity, whe I am using the free version doesn't allow me to convert money
+        //between rates, so we use the latest API and fetch the rates using `EUR` as base currency
+        //the we convert the given amount to `EUR` and the convert to desired currency
+
+        //base value always will be EUR.
+        $fromCurrency = $data['rates'][$this->fromCurrency];
+        $toCurrency = $data['rates'][$this->toCurrency];
+
+        $newAmount = ($this->amount / $fromCurrency) * $toCurrency;
 
         Transaction::createExchangeFromIncomingMessage([
             'user_id' => $this->loggedUser['id'],
@@ -154,7 +163,7 @@ class ExchangeConversation extends Conversation {
         ]);
 
         $this->bot->typesAndWaits(.5);
-        $this->bot->reply('Congrats! 🎉. The money convertion was successfully, your returned amount is: ' . $newAmount);
+        $this->bot->reply('Congrats! 🎉. The money convertion was successfully, your returned amount is: ' . $newAmount . $this->toCurrency);
     }
 
 }
