@@ -7,6 +7,7 @@ use Validator;
 use App\Transaction;
 use BotMan\BotMan\Messages\Incoming\Answer;
 use BotMan\BotMan\Messages\Outgoing\Question;
+use App\Http\Conversations\ExchangeConversation;
 use App\Http\Conversations\WithdrawConversation;
 use BotMan\BotMan\Messages\Outgoing\Actions\Button;
 use BotMan\BotMan\Messages\Conversations\Conversation;
@@ -44,11 +45,13 @@ class MenuOptionsConversation extends Conversation {
                     break;
                 case 'withdraw':
                     $this->bot->startConversation(new WithdrawConversation());
-                break;
-                case 'exchange': break;
+                    break;
+                case 'exchange':
+                    $this->bot->startConversation(new ExchangeConversation());
+                    break;
                 case 'balance':
                     $this->sayCurrentBalance();
-                break;
+                    break;
                 default:
                     $this->forgetMe();
                     break;

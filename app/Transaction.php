@@ -34,6 +34,10 @@ class Transaction extends Model
         Transaction::createFromIncomingMessage($data, 'withdraw');
     }
 
+    public static function createExchangeFromIncomingMessage(array $data) {
+        Transaction::createFromIncomingMessage($data, 'exchange');
+    }
+
     public static function createFromIncomingMessage(array $data, $type = 'deposit') {
         Transaction::create([
             'user_id' => $data['user_id'],
