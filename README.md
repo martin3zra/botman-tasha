@@ -7,16 +7,13 @@ To create the database structure and seed initial data please run the above comm
 php artisan migrate --seed
 ```
 
-Build docker image
+## Docker steps
+Build image
 ```shell
 docker build -t tasha:1.0.0 .
 ```
 
-Run docker container with image
+Run container with image
 ```shell
-docker run --name tasha -p 8090:80 \
-    -e DB_CONNECTION=sqlite \
-    -e EXCHANGE_URL= \
-    -e EXCHANGE_KEY= \
-    tasha:1.0.0
+docker run --name tasha -p 8090:80 -it -d tasha:1.0.0
 ```

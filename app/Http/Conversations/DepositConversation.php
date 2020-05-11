@@ -53,7 +53,7 @@ class DepositConversation extends Conversation {
 
     private function askCurrency() {
         $this->needExchange = false;
-        $question = Question::create('Your default currency is <b>'.$this->currency.'</b>. Do you want use a different one?')
+        $question = Question::create('Your default currency is '.$this->currency.'. Do you want use a different one?')
                 ->addButtons([
                     Button::create('Nope')->value('no'),
                     Button::create('Yes, a different one')->value('yes'),
@@ -94,7 +94,7 @@ class DepositConversation extends Conversation {
     private function askConfirmation() {
 
 
-        $question = Question::create("Great, we just need a confirmation of the transaction. Are you sure that want deposit {$this->amount} in {$this->currency}")
+        $question = Question::create("Great, we just need a confirmation of the transaction. Are you sure that want deposit {$this->moneyFormat()} in {$this->currency}")
             ->addButtons([
                 Button::create('Yes, proceed')->value('yes'),
                 Button::create('Nope, allow me make a change')->value('no'),
@@ -132,7 +132,7 @@ class DepositConversation extends Conversation {
         $this->bot->typesAndWaits(.5);
         $this->bot->reply('Congrats! 🎉. Your deposit was successfully.');
         $this->bot->typesAndWaits(1.5);
-        $this->bot->startConversation(new MenuOptionsConversation());
+        $this->bot->reply('Type "hey" and create another transaction.');
     }
 
     private function askRetry($option = 'amount') {
@@ -162,5 +162,9 @@ class DepositConversation extends Conversation {
             $this->bot->reply($e->getMessage());
             return 0;
         }
+    }
+
+    private function moneyFormat() {
+        return number_format($this->amount, 2);
     }
 }

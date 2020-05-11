@@ -37,7 +37,7 @@ class WithdrawConversation extends Conversation {
 
     private function askOption() {
         $this->bot->typesAndWaits(.5);
-        $this->ask('How much do you want get from your account?', function(Answer $answer) {
+        $this->ask('How much do you want withdraw from your account?', function(Answer $answer) {
             $validator = Validator::make(['amount' => $answer->getValue()], [
                 'amount' => 'required|numeric|min:1',
             ]);
@@ -53,7 +53,7 @@ class WithdrawConversation extends Conversation {
 
     private function askCurrency() {
         $this->needExchange = false;
-        $question = Question::create('Your default currency is <b>'.$this->currency.'</b>. Do you want use a different one?')
+        $question = Question::create('Your default currency is '.$this->currency.'. Do you want use a different one?')
                 ->addButtons([
                     Button::create('Nope')->value('no'),
                     Button::create('Yes, a different one')->value('yes'),
@@ -95,7 +95,7 @@ class WithdrawConversation extends Conversation {
     private function askConfirmation() {
 
 
-        $question = Question::create("Great, we just need a confirmation of the transaction. Are you sure that want get {$this->amount} in {$this->currency}")
+        $question = Question::create("Great, let's confirm the transaction. Are you sure that want to withdraw {$this->moneyFormat($this->amount)} in {$this->currency}")
             ->addButtons([
                 Button::create('Yes, proceed')->value('yes'),
                 Button::create('Nope, allow me make a change')->value('no'),
@@ -128,8 +128,7 @@ class WithdrawConversation extends Conversation {
         $balance = $this->getCurrentBalance();
         if ($this->amount > $balance) {
             $this->bot->typesAndWaits(.5);
-            $this->bot->reply('Whoops, Your withdraw amount is greather that the amount available in your account. <br />Current balance: ' . $balance);
-
+            $this->bot->reply('Whoops, you don\'t have enough balance in your account for this transaction. <br />Current balance: ' . $this->moneyFormat($balance) . $this->currency);
             $this->askNextOptions();
             return;
         }
@@ -143,7 +142,7 @@ class WithdrawConversation extends Conversation {
         $this->bot->typesAndWaits(.5);
         $this->bot->reply('Congrats! 🎉. Your withdraw was successfully.');
         $this->bot->typesAndWaits(1.5);
-        $this->bot->startConversation(new MenuOptionsConversation());
+        $this->bot->reply('Type "hey" and create another transaction.');
     }
 
     private function askRetry($option = 'amount') {
@@ -166,9 +165,9 @@ class WithdrawConversation extends Conversation {
     }
 
     private function askNextOptions() {
-        $question = Question::create("Want try a different amount?")
+        $question = Question::create("Would you like to try a different amount?")
             ->addButtons([
-                Button::create('Yes, try again')->value('yes'),
+                Button::create('Yes')->value('yes'),
                 Button::create('Nope')->value('no'),
             ]);
 
@@ -194,6 +193,10 @@ class WithdrawConversation extends Conversation {
             $this->bot->reply($e->getMessage());
             return 0;
         }
+    }
+
+    private function moneyFormat($amount = 0) {
+        return number_format($amount, 2);
     }
 
 }

@@ -29,7 +29,7 @@ class MenuOptionsConversation extends Conversation {
 
     private function askOption() {
         $this->bot->typesAndWaits(.5);
-        $question = Question::create($this->loggedUser['first_name'].', what kind of transaction do you want perform right away?')
+        $question = Question::create($this->loggedUser['first_name'].', what kind of transaction would you like to perform?')
             ->addButtons([
                 Button::create('Deposit')->value('deposit'),
                 Button::create('Withdraw')->value('withdraw'),
