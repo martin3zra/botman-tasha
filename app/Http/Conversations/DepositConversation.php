@@ -5,6 +5,7 @@ namespace App\Http\Conversations;
 use App\User;
 use Validator;
 use App\Transaction;
+use App\Services\MoneyFormat;
 use App\Services\ExchangeService;
 use BotMan\BotMan\Messages\Incoming\Answer;
 use BotMan\BotMan\Messages\Outgoing\Question;
@@ -94,7 +95,7 @@ class DepositConversation extends Conversation {
     private function askConfirmation() {
 
 
-        $question = Question::create("Great, we just need a confirmation of the transaction. Are you sure that want deposit {$this->moneyFormat()} in {$this->currency}")
+        $question = Question::create('Great, we just need a confirmation of the transaction. Are you sure that want deposit ' . MoneyFormat::format($this->amount) . ' in ' . $this->currency)
             ->addButtons([
                 Button::create('Yes, proceed')->value('yes'),
                 Button::create('Nope, allow me make a change')->value('no'),
@@ -162,9 +163,5 @@ class DepositConversation extends Conversation {
             $this->bot->reply($e->getMessage());
             return 0;
         }
-    }
-
-    private function moneyFormat() {
-        return number_format($this->amount, 2);
     }
 }

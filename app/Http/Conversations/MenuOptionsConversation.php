@@ -5,6 +5,7 @@ namespace App\Http\Conversations;
 use App\User;
 use Validator;
 use App\Transaction;
+use App\Services\MoneyFormat;
 use BotMan\BotMan\Messages\Incoming\Answer;
 use BotMan\BotMan\Messages\Outgoing\Question;
 use App\Http\Conversations\ExchangeConversation;
@@ -67,7 +68,7 @@ class MenuOptionsConversation extends Conversation {
     private function sayCurrentBalance() {
 
         $balance = Transaction::balanceFor((int)$this->loggedUser['id']);
-        $this->bot->reply('Hey, ' . $this->loggedUser['first_name'] . ' your current balance is: ' . $balance);
+        $this->bot->reply('Hey, ' . $this->loggedUser['first_name'] . ' your current balance is: ' . MoneyFormat::format($balance) . $this->loggedUser['currency']);
         $this->bot->reply('If you want to perform another transaction just type "hey"');
     }
 }

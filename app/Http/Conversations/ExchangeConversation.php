@@ -6,6 +6,7 @@ use App\User;
 use Validator;
 use App\Transaction;
 use GuzzleHttp\Client;
+use App\Services\MoneyFormat;
 use App\Services\ExchangeService;
 use BotMan\BotMan\Messages\Incoming\Answer;
 use BotMan\BotMan\Messages\Outgoing\Question;
@@ -92,7 +93,7 @@ class ExchangeConversation extends Conversation {
 
     private function askConfirmation() {
 
-        $question = Question::create("Great, we just need a confirmation of the transaction. Are you sure that want convert {$this->amount} in {$this->fromCurrency} to {$this->toCurrency}")
+        $question = Question::create('Great, we just need a confirmation of the transaction. Are you sure that want convert '. MoneyFormat::format($this->amount) .$this->fromCurrency .' to ' . $this->toCurrency)
             ->addButtons([
                 Button::create('Yes, proceed')->value('yes'),
                 Button::create('Nope, allow me make a change')->value('no'),
@@ -140,7 +141,7 @@ class ExchangeConversation extends Conversation {
             ]);
 
             $this->bot->typesAndWaits(.5);
-            $this->bot->reply('Congrats! 🎉. The money convertion was successfully, your returned amount is: ' . $newAmount . $this->toCurrency);
+            $this->bot->reply('Congrats! 🎉. The money convertion was successfully, your returned amount is: ' . MoneyFormat::format($newAmount) . $this->toCurrency);
         }catch (Exception $e) {
             $this->bot->reply($e->getMessage);
             return;

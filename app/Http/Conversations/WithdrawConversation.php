@@ -5,6 +5,7 @@ namespace App\Http\Conversations;
 use App\User;
 use Validator;
 use App\Transaction;
+use App\Services\MoneyFormat;
 use App\Services\ExchangeService;
 use BotMan\BotMan\Messages\Incoming\Answer;
 use BotMan\BotMan\Messages\Outgoing\Question;
@@ -95,7 +96,7 @@ class WithdrawConversation extends Conversation {
     private function askConfirmation() {
 
 
-        $question = Question::create("Great, let's confirm the transaction. Are you sure that want to withdraw {$this->moneyFormat($this->amount)} in {$this->currency}")
+        $question = Question::create('Great, let\'s confirm the transaction. Are you sure that want to withdraw ' . MoneyFormat::format($this->amount) .' in ' .$this->currency)
             ->addButtons([
                 Button::create('Yes, proceed')->value('yes'),
                 Button::create('Nope, allow me make a change')->value('no'),
@@ -128,7 +129,7 @@ class WithdrawConversation extends Conversation {
         $balance = $this->getCurrentBalance();
         if ($this->amount > $balance) {
             $this->bot->typesAndWaits(.5);
-            $this->bot->reply('Whoops, you don\'t have enough balance in your account for this transaction. <br />Current balance: ' . $this->moneyFormat($balance) . $this->currency);
+            $this->bot->reply('Whoops, you don\'t have enough balance in your account for this transaction. <br />Current balance: ' . MoneyFormat::format($balance) . $this->currency);
             $this->askNextOptions();
             return;
         }
@@ -193,10 +194,6 @@ class WithdrawConversation extends Conversation {
             $this->bot->reply($e->getMessage());
             return 0;
         }
-    }
-
-    private function moneyFormat($amount = 0) {
-        return number_format($amount, 2);
     }
 
 }
