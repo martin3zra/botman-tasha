@@ -32,6 +32,11 @@ php artisan storage:link
 php artisan migrate --seed
 ```
 
+Finally to run the application.
+
+```
+php artisan serve --port=8090
+```
 
 ## Run with Docker
 
