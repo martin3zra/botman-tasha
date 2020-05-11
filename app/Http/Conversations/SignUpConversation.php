@@ -13,7 +13,7 @@ use BotMan\BotMan\Messages\Conversations\Conversation;
 
 class SignUpConversation extends Conversation {
     protected $user;
-    protected array $info = [];
+    protected $info;
 
     public function run()
     {
@@ -23,7 +23,7 @@ class SignUpConversation extends Conversation {
     }
 
     private function sayWelcomeAndAuthenticateIfPossible() {
-        $this->bot->reply('Wuhu, great to have you on board! 🎉. <br />In order to use me as expense managment you need to create a account.');
+        $this->bot->reply('Wuhu, great to have you on board! 🎉. <br />In order to use me as expense managment you need to create an account.');
         $this->askForFirstName();
     }
 
@@ -121,7 +121,7 @@ class SignUpConversation extends Conversation {
     private function registerUser() {
         $user = $this->findUser();
         if ($user) {
-            $this->bot->reply('Whoops, An account already exists with this phone numer.');
+            $this->bot->reply('Whoops, An account already exists with this phone number.');
             $this->bot->reply('Type "register" and try again.');
             return;
         }

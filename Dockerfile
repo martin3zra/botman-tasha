@@ -40,7 +40,10 @@ COPY . /var/www/html
 RUN composer install
 RUN chgrp -R www-data storage bootstrap/cache \
     && chmod -R ug+rwx storage bootstrap/cache \
-    && chmod -R 777 vendor
+    && chmod -R 777 vendor \
+    && cp .env.example .env \
+    && touch ./database/database.sqlite \
+    && chmod -R 777 database
 
 RUN php artisan key:generate --no-interaction
 RUN php artisan storage:link

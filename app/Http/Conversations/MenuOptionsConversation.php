@@ -31,10 +31,10 @@ class MenuOptionsConversation extends Conversation {
         $this->bot->typesAndWaits(.5);
         $question = Question::create($this->loggedUser['first_name'].', what kind of transaction do you want perform right away?')
             ->addButtons([
-                Button::create('A deposit')->value('deposit'),
-                Button::create('A Withdraw')->value('withdraw'),
-                Button::create('A exchange')->value('exchange'),
-                Button::create('A balance check')->value('balance'),
+                Button::create('Deposit')->value('deposit'),
+                Button::create('Withdraw')->value('withdraw'),
+                Button::create('Currency conversion')->value('exchange'),
+                Button::create('Check balance')->value('balance'),
                 Button::create('Sign out')->value('forgetme'),
             ]);
 
@@ -61,7 +61,7 @@ class MenuOptionsConversation extends Conversation {
 
     private function forgetMe() {
         $this->bot->driverStorage()->delete();
-        $this->bot->reply('Good bye! <br />');
+        $this->bot->reply('Good bye!');
     }
 
     private function sayCurrentBalance() {

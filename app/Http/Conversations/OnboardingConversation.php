@@ -27,7 +27,7 @@ class OnboardingConversation extends Conversation {
     private function sayWelcome() {
 
         if (! is_null($this->loggedUser)) {
-            $this->bot->reply('Hi!, Welcome to back Tasha Expenser, ' . $this->loggedUser['first_name']);
+            $this->bot->reply('Hi!, Welcome back to Tasha Expenser, ' . $this->loggedUser['first_name']);
             $this->bot->typesAndWaits(.5);
             $this->startTransactionConversations();
             return ;
@@ -46,7 +46,7 @@ class OnboardingConversation extends Conversation {
     private function askForAction() {
 
         //create question
-        $question = Question::create('In order to perform any transaction such as deposit, withdraw or money exchange you must be authenticated in the system. Do you have account already?')
+        $question = Question::create('In order to perform any transaction such as deposit, withdraw or currency conversion you must be authenticated in the system. Do you have an account already?')
             ->fallback('Unable to authenticate you. :(')
             ->addButtons([
                 Button::create('Yes, I have one')->value('yes'),

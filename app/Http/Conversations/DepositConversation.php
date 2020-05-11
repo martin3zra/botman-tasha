@@ -53,7 +53,7 @@ class DepositConversation extends Conversation {
 
     private function askCurrency() {
         $this->needExchange = false;
-        $question = Question::create('Your default currency is '.$this->currency.'. Do you want use a different one?')
+        $question = Question::create('Your default currency is <b>'.$this->currency.'</b>. Do you want use a different one?')
                 ->addButtons([
                     Button::create('Nope')->value('no'),
                     Button::create('Yes, a different one')->value('yes'),
@@ -75,7 +75,9 @@ class DepositConversation extends Conversation {
         $buttons = [];
 
         foreach ($currencies as $currency) {
-            $buttons[] = Button::create($currency['code'] . ' - '. $currency['country'])->value($currency['code']);
+            if (! $currency['code'] !=  $this->currency) {
+                $buttons[] = Button::create($currency['code'] . ' - '. $currency['country'])->value($currency['code']);
+            }
         }
 
         $question = Question::create("Choose a desire currency for you deposit.")
