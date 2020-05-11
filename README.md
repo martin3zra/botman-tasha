@@ -12,6 +12,12 @@ Please follow the steps below if you would like to play with `Tasha` a little.
 Make sure you have `PHP 7.x`, [Composer](https://getcomposer.org/) and `php-sqlite3` installed and set up in your local machine. Run the below commands in the order they appear.
 
 ```shell
+# Clone the source code or download the .zip file from github.
+git clone https://github.com/martin3zra/botman-tasha.git
+
+# Enter the project directory.
+cd bowling-scoring
+
 # Install dependencies
 composer install
 
