@@ -57,7 +57,7 @@ The bot will show you a welcome message and guide you through the necessary step
 
 After you signed up, log in so that you can perform money transactions.
 
-1. Type one of the following trigger phrase to start interacting with `Tasha`: `GET_STARTED | hey | start`.
+1. Type one of the following trigger phrase to start interacting with `Tasha`: `hey | hello | hi | start`.
 2. Type `register` to initiate the signup process flow, then follow the prompts to enter the necessary information required to create your account.
 3. Type `authenticate` to initiate the login flow. This command will start a conversation to ask you questions about your account and help you with the authentication process.
 4. Finally, a fallback message is displayed whenever you type an unknown command.

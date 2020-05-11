@@ -28,7 +28,7 @@ class Tasha extends Controller
         $botman = BotManFactory::create($this->config, new LaravelCache());
         $this->loadCurrencies($botman);
         // Hears for whisper to start the onboarding process
-        $botman->hears('GET_STARTED|hey|start', function(BotMan $bot) {
+        $botman->hears('GET_STARTED|hey|hi|hello|start', function(BotMan $bot) {
             $bot->startConversation(new OnboardingConversation());
         });
 
@@ -47,7 +47,7 @@ class Tasha extends Controller
             $bot->typesAndWaits(1);
             $bot->reply('Alfredo said I need to focus on telling you about the transactions that I can help with. Maybe later he will train me to understand your messages as well. I hope so ☺️');
 
-            $bot->reply('type "hey" or "start" or "GET_STARTED" to continue.');
+            $bot->reply('type "hey" or "start" or "hi" or "hello" to continue.');
             //TODO: render buttons with the supported options
         });
 
