@@ -16,7 +16,7 @@ Make sure you have `PHP 7.x`, [Composer](https://getcomposer.org/) and `php-sqli
 git clone https://github.com/martin3zra/botman-tasha.git
 
 # Enter the project directory.
-cd bowling-scoring
+cd botman-tasha
 
 # Install dependencies
 composer install
